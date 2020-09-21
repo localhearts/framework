@@ -1,0 +1,37 @@
+version: '3'
+services:
+  app:
+    container_name: full_app
+    build: .
+    ports: 
+      - 8080:8080 # Forward the exposed port 8080 on the container to port 8080 on the host machine
+    restart: on-failure
+    volumes:
+      - api:/usr/src/app/
+    depends_on:
+      - mysql # This service depends on mysql. Start that first.
+    networks:
+      - framework
+
+mysql:
+    image: mysql:5.7
+    ports: 
+        - 3306:3306
+    environment: 
+        - MYSQL_DATABASE=${DB_NAME}
+        - MYSQL_USER=${DB_USER}
+        - MYSQL_PASSWORD=${DB_PASSWORD}
+        - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+        - DATABASE_HOST=${DB_HOST} 
+    volumes:
+        - database_mysql:/var/lib/postgresql/data
+    networks:
+        - framework
+
+volumes:
+  api:
+  database_mysql:
+
+# Networks to be created to facilitate communication between containers
+networks:
+  framework:
